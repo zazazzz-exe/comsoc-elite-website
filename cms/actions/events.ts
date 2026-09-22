@@ -16,6 +16,7 @@ const eventSchema = z.object({
   time_label: z.string().max(80).optional(),
   description: z.string().max(10000).optional(),
   cover_image_url: z.string().url().optional().or(z.literal("")),
+  coverImageAssetId: z.string().uuid().optional().or(z.literal("")),
 });
 
 function data(formData: FormData) {
@@ -28,7 +29,7 @@ export async function saveEvent(formData: FormData) {
   await requireAdmin();
   const values = data(formData);
   const { id, ...record } = values;
-  const eventData = { slug: record.slug, title: record.title, eventKind: record.event_kind, startsAt: new Date(record.starts_at), status: record.status, location: record.location || null, timeLabel: record.time_label || null, description: record.description || null, coverImageUrl: record.cover_image_url || null };
+  const eventData = { slug: record.slug, title: record.title, eventKind: record.event_kind, startsAt: new Date(record.starts_at), status: record.status, location: record.location || null, timeLabel: record.time_label || null, description: record.description || null, coverImageUrl: record.cover_image_url || null, ...(record.coverImageAssetId ? { coverImageAssetId: record.coverImageAssetId } : {}) };
   if (id) await prisma.event.update({ where: { id }, data: eventData }); else await prisma.event.create({ data: eventData });
   revalidatePath("/content/events");
   revalidatePath("/content");

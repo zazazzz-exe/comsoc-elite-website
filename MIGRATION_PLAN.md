@@ -46,7 +46,7 @@ The model is derived from the existing public sections only:
 - **Faculty members:** name, department, portrait, display order, publish state.
 - **Organization people:** officers and advisers for COMSOC and CCS Elite, role, team, tier, contact details, portrait, display order, and publish state.
 - **Events:** upcoming and gallery records, title, start/end dates, location, time, budget, description or gallery summary, cover image, gallery images, display order, and publish state.
-- **Media:** storage-backed records for images used by the above entities.
+- **Media:** Cloudinary-backed records for images used by the above entities. Content records retain delivery URLs and reference their uploaded media records.
 
 No projects, services, testimonials, announcements, or generic pages are added because the current site does not expose them.
 
@@ -55,7 +55,7 @@ No projects, services, testimonials, announcements, or generic pages are added b
 - Add `cms_admins`, `site_settings`, `faculty_members`, `organization_people`, `events`, and `event_media` tables.
 - Use a `content_status` enum (`draft`, `published`, `archived`).
 - Enable RLS on every CMS table. Public `SELECT` policies are limited to published content and the singleton public settings row. CMS writes are limited to users present in `cms_admins`.
-- Store all portraits and event imagery in a non-public Supabase Storage bucket. Publicly rendered URLs are supplied through a controlled public bucket policy or signed URL strategy selected during Supabase setup.
+- Store all portraits and event imagery in Cloudinary. The CMS persists Cloudinary delivery URLs and asset metadata in `media_assets`, then references that record from content where applicable.
 - A CMS change invokes a protected website revalidation endpoint so the public site invalidates only its `cms-content` cache tag.
 
 ## Implementation Plan
