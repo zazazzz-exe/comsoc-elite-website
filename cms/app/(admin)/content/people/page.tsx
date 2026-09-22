@@ -1,10 +1,17 @@
 import Link from "next/link";
-import { savePerson } from "@/actions/people";
-import { CloudinaryAssetField } from "@/components/content/cloudinary-asset-field";
+import { PeopleEditor, type PersonRow } from "@/components/content/people-editor";
+import { prisma } from "@/lib/prisma";
 
-const input = "mt-2 w-full border border-white/15 bg-[#09090b] px-3 py-2.5 text-sm text-white focus:border-emerald-300";
+async function people(): Promise<PersonRow[]> {
+  try {
+    const rows = await prisma.organizationPerson.findMany({ orderBy: [{ organization: "asc" }, { tier: "asc" }, { name: "asc" }] });
+    return rows.map((person) => ({ ...person, organization: person.organization as PersonRow["organization"], personKind: person.personKind as PersonRow["personKind"], status: person.status as PersonRow["status"] }));
+  } catch {
+    return [];
+  }
+}
 
-export default function PeopleEditor() {
-  return <><Link href="/content" className="text-xs font-medium tracking-[0.12em] text-emerald-200 hover:text-white">BACK TO CONTENT</Link><p className="mt-8 font-mono text-[11px] tracking-[0.2em] text-emerald-300">PEOPLE / ROSTER</p><h1 className="mt-3 font-display text-4xl font-light tracking-wide text-white">ADD A PERSON</h1><p className="mt-4 max-w-2xl text-sm leading-6 text-white/55">Use one record for each officer or adviser. Select adviser to update the faculty adviser details presented on the website.</p>
-  <form action={savePerson} className="mt-10 grid max-w-4xl gap-5 border border-white/10 bg-[#111113] p-5 md:grid-cols-2 md:p-7"><label className="text-xs font-medium tracking-[0.12em] text-white/70">FULL NAME<input required name="name" className={input} /></label><label className="text-xs font-medium tracking-[0.12em] text-white/70">ROLE<input required name="role" placeholder="President or Faculty Adviser" className={input} /></label><label className="text-xs font-medium tracking-[0.12em] text-white/70">ORGANIZATION<select name="organization" className={input}><option value="comsoc">COMSOC</option><option value="ccs_elites">CCS Elites</option></select></label><label className="text-xs font-medium tracking-[0.12em] text-white/70">RECORD TYPE<select name="personKind" className={input}><option value="officer">Officer</option><option value="adviser">Adviser</option></select></label><label className="text-xs font-medium tracking-[0.12em] text-white/70">PYRAMID TIER<input name="tier" type="number" min="0" max="9" defaultValue="0" className={input} /></label><label className="text-xs font-medium tracking-[0.12em] text-white/70">STATUS<select name="status" className={input}><option value="draft">Draft</option><option value="published">Published</option><option value="archived">Archived</option></select></label><label className="text-xs font-medium tracking-[0.12em] text-white/70">DEPARTMENT<input name="department" className={input} /></label><label className="text-xs font-medium tracking-[0.12em] text-white/70">EMAIL<input name="email" type="email" className={input} /></label><label className="text-xs font-medium tracking-[0.12em] text-white/70 md:col-span-2">FACEBOOK URL<input name="facebookUrl" type="url" className={input} /></label><div className="md:col-span-2"><CloudinaryAssetField name="imageUrl" label="PORTRAIT" /></div><button className="w-fit border border-emerald-300/60 px-4 py-2.5 text-xs font-medium tracking-[0.14em] text-emerald-200 hover:bg-emerald-300 hover:text-[#09090b]">SAVE PERSON</button></form></>;
+export default async function PeoplePage() {
+  const rows = await people();
+  return <><Link href="/content" className="text-sm text-emerald-200 hover:text-white">Content</Link><div className="mt-5 flex flex-wrap items-end justify-between gap-3"><div><h1 className="text-3xl font-semibold text-white">People</h1><p className="mt-2 text-sm text-white/55">{rows.length} roster records. Search a person to edit their details or portrait.</p></div><span className="border border-white/10 px-3 py-2 text-xs font-medium tracking-[0.12em] text-white/45">ROSTER</span></div><PeopleEditor people={rows} /></>;
 }

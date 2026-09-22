@@ -3,10 +3,10 @@
 import Image from "next/image";
 import { useState } from "react";
 
-type UploadedAsset = { id: string; url: string };
+type UploadedAsset = { id?: string; url: string };
 
-export function CloudinaryAssetField({ name, assetIdName = name === "cover_image_url" ? "coverImageAssetId" : "imageAssetId", label, multiple = false }: { name: string; assetIdName?: string; label: string; multiple?: boolean }) {
-  const [assets, setAssets] = useState<UploadedAsset[]>([]);
+export function CloudinaryAssetField({ name, assetIdName = name === "cover_image_url" ? "coverImageAssetId" : "imageAssetId", initialAssets = [], label, multiple = false }: { name: string; assetIdName?: string; initialAssets?: UploadedAsset[]; label: string; multiple?: boolean }) {
+  const [assets, setAssets] = useState<UploadedAsset[]>(initialAssets);
   const [message, setMessage] = useState<string>();
   const [uploading, setUploading] = useState(false);
 
@@ -26,8 +26,8 @@ export function CloudinaryAssetField({ name, assetIdName = name === "cover_image
 
   return <div className="border border-dashed border-white/20 bg-[#0c0c0e] p-4">
     <div className="flex items-center justify-between gap-3"><label className="text-xs font-medium tracking-[0.12em] text-white/70">{label}<input onChange={(event) => upload(event.target.files)} type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple={multiple} className="sr-only" /></label><label className="cursor-pointer border border-white/15 px-3 py-2 text-[10px] font-medium tracking-[0.12em] text-white/70 hover:border-emerald-300/60 hover:text-emerald-200">{uploading ? "UPLOADING" : "CHOOSE IMAGE"}<input onChange={(event) => upload(event.target.files)} type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple={multiple} className="sr-only" /></label></div>
-    {assets.map((asset) => <div key={asset.id}><input type="hidden" name={name} value={asset.url} /><input type="hidden" name={assetIdName} value={asset.id} /></div>)}
-    {assets.length > 0 && <div className="mt-4 grid grid-cols-3 gap-2">{assets.map((asset) => <div key={asset.id} className="relative aspect-square overflow-hidden border border-white/10"><Image src={asset.url} alt="Uploaded asset" fill unoptimized className="object-cover" /></div>)}</div>}
+    {assets.map((asset) => <div key={asset.id ?? asset.url}><input type="hidden" name={name} value={asset.url} />{asset.id && <input type="hidden" name={assetIdName} value={asset.id} />}</div>)}
+    {assets.length > 0 && <div className="mt-4 grid grid-cols-3 gap-2">{assets.map((asset) => <div key={asset.id ?? asset.url} className="relative aspect-square overflow-hidden border border-white/10"><Image src={asset.url} alt="Uploaded asset" fill unoptimized className="object-cover" /></div>)}</div>}
     <p className="mt-3 text-xs text-white/40">{message ?? (multiple ? "Upload a gallery of supporting images." : "Upload a single image directly to this record.")}</p>
   </div>;
 }

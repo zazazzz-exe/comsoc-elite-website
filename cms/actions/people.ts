@@ -12,14 +12,14 @@ const facultySchema = z.object({ id: z.string().uuid().optional(), name: z.strin
 
 export async function savePerson(formData: FormData) {
   await requireAdmin(); const { id, email, facebookUrl, imageUrl, imageAssetId, ...data } = personSchema.parse(Object.fromEntries(formData));
-  const record = { ...data, email: email || null, facebookUrl: facebookUrl || null, imageUrl: imageUrl || null, imageAssetId: imageAssetId || null };
+  const record = { ...data, email: email || null, facebookUrl: facebookUrl || null, imageUrl: imageUrl || null, ...(imageAssetId ? { imageAssetId } : {}) };
   if (id) await prisma.organizationPerson.update({ where: { id }, data: record }); else await prisma.organizationPerson.create({ data: record });
   revalidatePath("/content"); revalidatePath("/content/people");
 }
 
 export async function saveFaculty(formData: FormData) {
   await requireAdmin(); const { id, imageUrl, imageAssetId, ...data } = facultySchema.parse(Object.fromEntries(formData));
-  const record = { ...data, imageUrl: imageUrl || null, imageAssetId: imageAssetId || null };
+  const record = { ...data, imageUrl: imageUrl || null, ...(imageAssetId ? { imageAssetId } : {}) };
   if (id) await prisma.facultyMember.update({ where: { id }, data: record }); else await prisma.facultyMember.create({ data: record });
   revalidatePath("/content"); revalidatePath("/content/faculty");
 }
