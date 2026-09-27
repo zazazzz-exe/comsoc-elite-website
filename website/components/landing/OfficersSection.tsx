@@ -5,13 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ArrowRightLeft } from "lucide-react";
 import { IconBrandFacebook, IconMail } from "@tabler/icons-react";
-import {
-  comsocOfficers,
-  ccsElites,
-  facultyAdviser,
-  ccsElitesAdviser,
-} from "@/lib/data/officers";
-import type { Officer } from "@/lib/data/officers";
+import type { Adviser, Officer, Team } from "@/lib/data/officers";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -189,9 +183,9 @@ function TierConnector() {
    OrgPyramid — renders the flippable pyramid for both orgs
    Responsive: single-col mobile, pyramid desktop
    ──────────────────────────────────────────────────────────── */
-function OrgPyramid({ flipped }: { flipped: boolean }) {
-  const comsocTiers = comsocOfficers.tiers;
-  const elitesTiers = ccsElites.tiers;
+function OrgPyramid({ flipped, comsocTeam, elitesTeam }: { flipped: boolean; comsocTeam: Team; elitesTeam: Team }) {
+  const comsocTiers = comsocTeam.tiers;
+  const elitesTiers = elitesTeam.tiers;
 
   return (
     <motion.div {...fadeUp} className="flex flex-col items-center w-full">
@@ -207,7 +201,7 @@ function OrgPyramid({ flipped }: { flipped: boolean }) {
             transition={{ duration: 0.3, ease }}
             className="text-[10px] sm:text-xs md:text-sm font-heading font-bold tracking-[0.25em] sm:tracking-[0.3em] uppercase text-white/50 whitespace-nowrap"
           >
-            {flipped ? ccsElites.name : comsocOfficers.name}
+            {flipped ? elitesTeam.name : comsocTeam.name}
           </motion.h3>
         </AnimatePresence>
         <div className="h-px flex-1 bg-white/10" />
@@ -345,9 +339,9 @@ function OrgPyramid({ flipped }: { flipped: boolean }) {
 /* ────────────────────────────────────────────────────────────
    Main Section
    ──────────────────────────────────────────────────────────── */
-export default function OfficersSection() {
+export default function OfficersSection({ comsocTeam, elitesTeam, comsocAdviser, elitesAdviser }: { comsocTeam: Team; elitesTeam: Team; comsocAdviser: Adviser; elitesAdviser: Adviser }) {
   const [flipped, setFlipped] = useState(false);
-  const adviser = flipped ? ccsElitesAdviser : facultyAdviser;
+  const adviser = flipped ? elitesAdviser : comsocAdviser;
 
   return (
     <section
@@ -388,7 +382,7 @@ export default function OfficersSection() {
         </motion.div>
 
         {/* ── Pyramid (flippable) ── */}
-        <OrgPyramid flipped={flipped} />
+        <OrgPyramid flipped={flipped} comsocTeam={comsocTeam} elitesTeam={elitesTeam} />
 
         {/* ── Faculty Adviser + Contact ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 sm:gap-14 md:gap-16 lg:gap-24 pt-14 sm:pt-16 md:pt-20 border-t border-white/10">

@@ -3,7 +3,6 @@
 import { useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { facultyMembers } from "@/lib/data/faculty";
 import type { Faculty } from "@/lib/data/faculty";
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -101,7 +100,7 @@ function FacultyCard({
 /* ────────────────────────────────────────────────────────────
    Main Section
    ──────────────────────────────────────────────────────────── */
-export default function FacultySection() {
+export default function FacultySection({ faculty }: { faculty: Faculty[] }) {
   return (
     <section
       id="faculty"
@@ -131,7 +130,7 @@ export default function FacultySection() {
           {...fadeUp}
           className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
         >
-          {facultyMembers.map((faculty, i) => (
+          {faculty.map((faculty, i) => (
             <FacultyCard key={faculty.name} faculty={faculty} delay={i * 0.05} />
           ))}
         </motion.div>

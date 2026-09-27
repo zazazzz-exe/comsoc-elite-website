@@ -5,14 +5,14 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 
-import { ModalEvent, upcomingEvents, galleryEvents } from "@/lib/data/events";
+import type { GalleryEvent, ModalEvent, UpcomingEvent } from "@/lib/data/events";
 import EventCalendar from "./EventCalendar";
 
 function formatBudget(amount: number) {
   return `₱${amount.toLocaleString()}`;
 }
 
-export default function EventsSection() {
+export default function EventsSection({ upcoming, gallery }: { upcoming: UpcomingEvent[]; gallery: GalleryEvent[] }) {
   const [selectedEvent, setSelectedEvent] = useState<ModalEvent | null>(null);
   const [selectedDateRange, setSelectedDateRange] = useState<{ start: Date; end: Date } | null>(null);
 
@@ -20,7 +20,7 @@ export default function EventsSection() {
     setSelectedDateRange(start && end ? { start, end } : null);
   }, []);
 
-  const filteredUpcomingEvents = upcomingEvents.filter(event => {
+  const filteredUpcomingEvents = upcoming.filter(event => {
     if (!selectedDateRange) return true;
     
     // Parse event date
@@ -181,7 +181,7 @@ export default function EventsSection() {
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {galleryEvents.map((event, i) => (
+            {gallery.map((event, i) => (
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}

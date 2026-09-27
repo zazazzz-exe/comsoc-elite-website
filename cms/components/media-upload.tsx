@@ -1,17 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { uploadMedia } from "@/lib/media/upload";
+import { useToast } from "@/components/feedback/toast-provider";
 
 export function MediaUpload() {
   const [message, setMessage] = useState<string>();
   const [uploading, setUploading] = useState(false);
+  const { toast } = useToast();
 
   async function upload(formData: FormData) {
-    setUploading(true);
+    if (!navigator.onLine) { toast("You are offline. The file was not uploaded.", "error"); return; }
+    setUploading(true); toast("Uploading file to Cloudinary…");
     setMessage(undefined);
-    const response = await fetch("/admin/api/media", { method: "POST", body: formData });
-    const result = await response.json() as { url?: string; error?: string };
-    setMessage(result.error ?? (result.url ? "Upload complete. The Cloudinary URL is now recorded in Supabase." : "Upload failed."));
+    const file = formData.get("file");
+    if (!(file instanceof File)) { setMessage("Choose a file to upload."); setUploading(false); return; }
+    try { await uploadMedia(file); setMessage("Upload complete. The Cloudinary URL is now recorded in Supabase."); toast("File uploaded and recorded.", "success"); } catch (error) { const message = error instanceof Error ? error.message : "Upload failed."; setMessage(message); toast(message, "error"); }
     setUploading(false);
   }
 

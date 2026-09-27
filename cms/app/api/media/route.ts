@@ -1,44 +1,47 @@
-import { v2 as cloudinary } from "cloudinary";
 import { NextResponse } from "next/server";
+import { z } from "zod";
+import { audit } from "@/lib/audit";
 import { requireAdmin } from "@/lib/auth/admin";
+import { cloudinary, cloudinaryConfig, maxUploadBytes } from "@/lib/cloudinary";
 import { prisma } from "@/lib/prisma";
 
-const maxUploadBytes = 10 * 1024 * 1024;
-const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "application/pdf"]);
+const assetSchema = z.object({
+  publicId: z.string().min(1).max(500).regex(/^comsoc\//),
+  resourceType: z.enum(["image", "raw", "video"]),
+});
+const allowedFormats = new Set(["jpg", "jpeg", "png", "webp", "gif", "pdf"]);
 
-function configureCloudinary() {
-  const { CLOUDINARY_CLOUD_NAME: cloud_name, CLOUDINARY_API_KEY: api_key, CLOUDINARY_API_SECRET: api_secret } = process.env;
-  if (!cloud_name || !api_key || !api_secret) throw new Error("Cloudinary is not configured.");
-  cloudinary.config({ cloud_name, api_key, api_secret });
+export async function GET(request: Request) {
+  await requireAdmin();
+  const query = new URL(request.url).searchParams.get("q")?.trim() ?? "";
+  try {
+    const assets = await prisma.mediaAsset.findMany({ where: { resourceType: "image", ...(query ? { OR: [{ publicId: { contains: query, mode: "insensitive" } }, { altText: { contains: query, mode: "insensitive" } }] } : {}) }, select: { id: true, url: true, publicId: true, altText: true }, orderBy: { createdAt: "desc" }, take: 48 });
+    return NextResponse.json(assets);
+  } catch {
+    return NextResponse.json({ error: "Could not load the media library." }, { status: 500 });
+  }
 }
 
 export async function POST(request: Request) {
-  await requireAdmin();
-  const formData = await request.formData();
-  const file = formData.get("file");
-
-  if (!(file instanceof File)) return NextResponse.json({ error: "Choose a file to upload." }, { status: 400 });
-  if (!allowedTypes.has(file.type)) return NextResponse.json({ error: "Use a JPG, PNG, WebP, GIF, or PDF file." }, { status: 415 });
-  if (file.size > maxUploadBytes) return NextResponse.json({ error: "Files must be 10 MB or smaller." }, { status: 413 });
-
+  const admin = await requireAdmin();
   try {
-    configureCloudinary();
-    const dataUri = `data:${file.type};base64,${Buffer.from(await file.arrayBuffer()).toString("base64")}`;
-    const asset = await cloudinary.uploader.upload(dataUri, { folder: "comsoc", resource_type: "auto" });
-    const record = await prisma.mediaAsset.create({
-      data: {
-        publicId: asset.public_id,
-        url: asset.secure_url,
-        resourceType: asset.resource_type,
-        format: asset.format,
-        bytes: asset.bytes,
-        width: asset.width,
-        height: asset.height,
-      },
+    const input = assetSchema.parse(await request.json());
+    cloudinaryConfig();
+    const asset = await cloudinary.api.resource(input.publicId, { resource_type: input.resourceType });
+    if (asset.public_id !== input.publicId || !asset.secure_url) return NextResponse.json({ error: "Uploaded asset could not be verified." }, { status: 422 });
+    if (!asset.format || !allowedFormats.has(asset.format.toLowerCase()) || asset.bytes > maxUploadBytes) {
+      await cloudinary.uploader.destroy(input.publicId, { resource_type: input.resourceType, invalidate: true });
+      return NextResponse.json({ error: "The uploaded file type or size is not allowed." }, { status: 422 });
+    }
+    const record = await prisma.mediaAsset.upsert({
+      where: { publicId: asset.public_id },
+      create: { publicId: asset.public_id, url: asset.secure_url, resourceType: asset.resource_type, format: asset.format, bytes: asset.bytes, width: asset.width, height: asset.height },
+      update: { url: asset.secure_url, resourceType: asset.resource_type, format: asset.format, bytes: asset.bytes, width: asset.width, height: asset.height },
     });
+    await audit(admin.id, "upsert", "media_asset", record.id, { publicId: record.publicId });
     return NextResponse.json(record, { status: 201 });
   } catch (error) {
-    console.error("Cloudinary upload failed", error);
-    return NextResponse.json({ error: "Upload failed. Check Cloudinary and database configuration." }, { status: 500 });
+    console.error("Cloudinary asset registration failed", error);
+    return NextResponse.json({ error: "The upload completed but could not be verified by the CMS." }, { status: 500 });
   }
 }

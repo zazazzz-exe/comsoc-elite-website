@@ -5,7 +5,7 @@ import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
-import { upcomingEvents } from "@/lib/data/events";
+import type { UpcomingEvent } from "@/lib/data/events";
 
 const navItems = [
   { name: "Home", href: "#home", num: "01" },
@@ -17,7 +17,7 @@ const navItems = [
   { name: "Contact", href: "#contact", num: "07" },
 ];
 
-export default function HeroSection() {
+export default function HeroSection({ upcomingEvents }: { upcomingEvents: UpcomingEvent[] }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (

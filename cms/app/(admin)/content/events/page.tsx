@@ -1,21 +1,18 @@
 import Link from "next/link";
-import { deleteEvent, saveEvent } from "@/actions/events";
-import { CloudinaryAssetField } from "@/components/content/cloudinary-asset-field";
+import { EventManager } from "@/components/content/event-manager";
+import type { EventRow } from "@/components/content/event-form";
 import { prisma } from "@/lib/prisma";
 
-type EventRow = { id: string; slug: string; title: string; event_kind: "upcoming" | "gallery"; starts_at: string; status: "draft" | "published" | "archived"; location: string | null; time_label: string | null; description: string | null; cover_image_url: string | null };
-async function events() { try { const rows = await prisma.event.findMany({ orderBy: { startsAt: "desc" } }); return rows.map((event) => ({ id: event.id, slug: event.slug, title: event.title, event_kind: event.eventKind as EventRow["event_kind"], starts_at: event.startsAt.toISOString().slice(0, 10), status: event.status, location: event.location, time_label: event.timeLabel, description: event.description, cover_image_url: event.coverImageUrl })); } catch { return []; } }
-
-function EventForm({ event }: { event?: EventRow }) {
-  return <form action={saveEvent} className="grid gap-4 border border-white/10 bg-[#111113] p-5 md:grid-cols-2">
-    {event && <input type="hidden" name="id" value={event.id} />}<label className="text-sm">Title<input required name="title" defaultValue={event?.title} className="mt-1 w-full border border-[#d8ded8] p-2" /></label><label className="text-sm">Slug<input required name="slug" defaultValue={event?.slug} pattern="[a-z0-9-]+" className="mt-1 w-full border border-[#d8ded8] p-2" /></label>
-    <label className="text-sm">Type<select name="event_kind" defaultValue={event?.event_kind ?? "upcoming"} className="mt-1 w-full border border-[#d8ded8] p-2"><option value="upcoming">Upcoming</option><option value="gallery">Gallery</option></select></label><label className="text-sm">Date<input required type="date" name="starts_at" defaultValue={event?.starts_at} className="mt-1 w-full border border-[#d8ded8] p-2" /></label>
-    <label className="text-sm">Status<select name="status" defaultValue={event?.status ?? "draft"} className="mt-1 w-full border border-[#d8ded8] p-2"><option value="draft">Draft</option><option value="published">Published</option><option value="archived">Archived</option></select></label><label className="text-sm">Location<input name="location" defaultValue={event?.location ?? ""} className="mt-1 w-full border border-[#d8ded8] p-2" /></label>
-    {event?.cover_image_url && <input type="hidden" name="cover_image_url" value={event.cover_image_url} />}<div className="md:col-span-2"><CloudinaryAssetField name="cover_image_url" label="EVENT COVER IMAGE" /></div><label className="text-sm md:col-span-2">Description<textarea name="description" defaultValue={event?.description ?? ""} rows={4} className="mt-1 w-full border border-[#d8ded8] p-2" /></label><button className="w-fit bg-[#166a58] px-4 py-2 text-sm font-medium text-white">{event ? "Save changes" : "Create event"}</button>
-  </form>;
+async function events(): Promise<EventRow[]> {
+  try {
+    const rows = await prisma.event.findMany({ include: { media: { orderBy: [{ displayOrder: "asc" }, { id: "asc" }] } }, orderBy: [{ startsAt: "desc" }, { displayOrder: "asc" }] });
+    return rows.map((event) => ({ ...event, eventKind: event.eventKind as EventRow["eventKind"], status: event.status as EventRow["status"], startsAt: event.startsAt.toISOString().slice(0, 10), endsAt: event.endsAt?.toISOString().slice(0, 10) ?? null, budget: event.budget?.toString() ?? null, media: event.media }));
+  } catch {
+    return [];
+  }
 }
 
-export default async function EventsEditor() {
+export default async function EventsPage() {
   const rows = await events();
-  return <><Link href="/content" className="text-sm text-[#166a58] underline">Back to content</Link><h1 className="mt-3 text-3xl font-semibold">Events</h1><p className="mt-2 text-sm text-black/60">Draft events remain private. Publishing makes an event eligible for the public website query.</p><h2 className="mt-7 text-lg font-semibold">New event</h2><div className="mt-3"><EventForm /></div><div className="mt-8 space-y-5">{rows.map((event) => <section key={event.id}><h2 className="mb-2 font-semibold">Edit: {event.title}</h2><EventForm event={event} /><form action={deleteEvent} className="mt-2"><input type="hidden" name="id" value={event.id} /><button className="text-sm text-red-700 underline">Delete event</button></form></section>)}</div></>;
+  return <><Link href="/content" className="text-xs font-medium tracking-[0.12em] text-emerald-200 hover:text-white">BACK TO CONTENT</Link><h1 className="mt-8 font-display text-4xl font-light tracking-wide text-white">EVENTS</h1><p className="mt-4 max-w-2xl text-sm leading-6 text-white/55">Filter the program by status or type, then work on one event at a time. Drafts remain private until published.</p><EventManager events={rows} /></>;
 }
