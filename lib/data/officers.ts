@@ -42,7 +42,7 @@ export const comsocOfficers: Team = {
       },
       {
         role: "Vice President for External Affairs",
-        name: "Zarrah Ezekiel Valles",
+        name: "Zarrah Exekiel Valles",
         image: "/images/officers/4. VP - EXTERNAL.png",
         email: "valles_zarrahexekiel@plpasig.edu.ph",
         facebook: "https://www.facebook.com/share/14pXvfiSecT/",
@@ -51,7 +51,7 @@ export const comsocOfficers: Team = {
     [
       {
         role: "Secretary",
-        name: "Gwynzurin Z. Martinez",
+        name: "Gwynzurin Martinez",
         image: "/images/officers/5. SECRETARY.png",
         email: "martinez_gwynzurinz@plpasig.edu.ph",
         facebook: "https://www.facebook.com/share/19WmYzPQg4/",
