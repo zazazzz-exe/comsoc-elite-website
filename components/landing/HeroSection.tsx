@@ -162,7 +162,7 @@ export default function HeroSection() {
             <a
               key={item.name}
               href={item.href}
-              className="text-4xl font-display font-light uppercase tracking-[0.2em] text-white hover:text-white/50 transition-colors"
+              className="text-2xl font-display font-light uppercase tracking-[0.2em] text-white transition-colors hover:text-white/50 sm:text-3xl"
               onClick={() => setMenuOpen(false)}
             >
               {item.name}

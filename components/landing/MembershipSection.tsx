@@ -43,7 +43,7 @@ export default function MembershipSection() {
               <h3 className="text-2xl md:text-3xl font-heading font-light tracking-[0.2em] uppercase text-white/90">
                 About Membership
               </h3>
-              <p className="text-white/60 leading-relaxed font-sans">
+              <p className="text-sm text-white/60 leading-relaxed font-sans md:text-base">
                 The PLP Computer Society has consistently fostered technological competence, leadership, and community engagement among students of the College of Computer Studies.
               </p>
             </div>
@@ -51,7 +51,7 @@ export default function MembershipSection() {
               <h3 className="text-2xl md:text-3xl font-heading font-light tracking-[0.2em] uppercase text-white/90">
                 Member Experience
               </h3>
-              <ul className="flex flex-col gap-3 text-white/60 font-sans">
+              <ul className="flex flex-col gap-3 text-sm text-white/60 font-sans md:text-base">
                 <li className="flex items-start gap-3">
                   <span className="text-white/40 mt-0.5">✦</span>
                   <span><strong className="font-medium text-white/80">Leadership experience:</strong> gain experience in organizing events, teamwork, communication, and student leadership.</span>
@@ -80,7 +80,7 @@ export default function MembershipSection() {
               <h3 className="text-2xl md:text-3xl font-heading font-light tracking-[0.2em] uppercase text-white/90">
                 CCS Member Benefits
               </h3>
-              <ul className="flex flex-col gap-3 text-white/60 font-sans">
+              <ul className="flex flex-col gap-3 text-sm text-white/60 font-sans md:text-base">
                 <li className="flex items-start gap-3">
                   <span className="text-white/40 mt-0.5">✦</span>
                   <span><strong className="font-medium text-white/80">Academic and professional development:</strong> opportunities to join seminars, workshops, competitions, and peer-learning activities.</span>

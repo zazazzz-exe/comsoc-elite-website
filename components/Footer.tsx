@@ -27,7 +27,7 @@ export default function Footer() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-50px" }}
         transition={{ duration: 0.8, ease }}
-        className="mx-auto grid max-w-7xl gap-12 px-6 py-16 md:grid-cols-2 md:px-12 lg:grid-cols-[1.4fr_0.75fr_1fr] lg:px-16"
+        className="mx-auto grid max-w-7xl gap-12 px-6 py-16 md:grid-cols-2 md:px-12 lg:grid-cols-[1.4fr_0.75fr_1fr_1fr] lg:px-16"
       >
         <div className="flex max-w-sm flex-col gap-5">
           <div className="text-lg font-heading font-light uppercase tracking-[0.2em] text-white/90">
@@ -79,6 +79,17 @@ export default function Footer() {
               <span>0915 386 8047</span>
             </a>
           </div>
+        </div>
+
+        <div className="flex flex-col gap-5">
+          <div className="text-[10px] font-heading font-bold uppercase tracking-[0.3em] text-white/35">
+            Partnered with
+          </div>
+          <img
+            src="/partners/datacamp-donates.png"
+            alt="DataCamp Donates"
+            className="h-auto w-full max-w-48"
+          />
         </div>
       </motion.div>
 

@@ -64,7 +64,7 @@ function CardFace({ officer }: { officer: Officer }) {
             {officer.role}
           </div>
         )}
-        <div className="flex min-h-8 items-center justify-center text-sm font-display uppercase leading-tight tracking-[0.1em] text-white md:text-base">
+        <div className="flex min-h-8 items-center justify-center text-base font-display uppercase leading-tight tracking-[0.1em] text-white md:text-lg">
           {officer.name}
         </div>
         {(officer.email || officer.facebook) && (
@@ -235,7 +235,7 @@ export default function OfficersSection() {
           className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8"
         >
           <div>
-            <div className="text-xl md:text-2xl font-light text-white/50 mb-4 font-heading tracking-wider">
+            <div className="text-xl font-heading font-light tracking-wider text-white/80 md:text-2xl mb-4">
               \\ 04
             </div>
             <h2 className="text-[clamp(2.5rem,6vw,5rem)] font-display font-light tracking-[0.15em] leading-[1] uppercase text-white">

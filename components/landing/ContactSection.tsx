@@ -45,7 +45,7 @@ export default function ContactSection() {
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/80 group-hover:bg-emerald-400 transition-colors shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
               Official Email
             </div>
-            <a href="mailto:comsoc@plpcomputersociety.org" className="text-[clamp(1rem,5vw,2.25rem)] md:text-4xl lg:text-5xl font-display uppercase tracking-wider text-white group-hover:text-white/90 transition-colors break-all">
+            <a href="mailto:comsoc@plpcomputersociety.org" className="text-base sm:text-2xl md:text-3xl lg:text-4xl font-display uppercase tracking-[0.05em] text-white group-hover:text-white/90 transition-colors break-words">
               comsoc@plpcomputersociety.org
             </a>
             <div className="hidden md:flex justify-end w-24 lg:w-32">
@@ -66,15 +66,15 @@ export default function ContactSection() {
               Social Media
             </div>
             <div className="flex gap-4 md:gap-8 flex-col sm:flex-row sm:items-center">
-              <a href="https://www.facebook.com/PLPCOMSOC" target="_blank" rel="noopener noreferrer" className="text-xl md:text-3xl font-display uppercase tracking-wider text-white/70 hover:text-white transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-white after:origin-right after:scale-x-0 hover:after:scale-x-100 hover:after:origin-left after:transition-transform after:duration-500">
+              <a href="https://www.facebook.com/PLPCOMSOC" target="_blank" rel="noopener noreferrer" className="text-base font-heading uppercase tracking-[0.15em] text-white/70 hover:text-white transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-white after:origin-right after:scale-x-0 hover:after:scale-x-100 hover:after:origin-left after:transition-transform after:duration-500 md:text-lg">
                 Facebook
               </a>
-              <span className="text-white/20 text-xl md:text-3xl hidden sm:inline-block">/</span>
-              <span aria-disabled="true" className="text-xl md:text-3xl font-display uppercase tracking-wider text-white/30 cursor-not-allowed">
+              <span className="hidden text-base text-white/20 sm:inline-block md:text-lg">/</span>
+              <span aria-disabled="true" className="cursor-not-allowed text-base font-heading uppercase tracking-[0.15em] text-white/30 md:text-lg">
                 Twitter
               </span>
-              <span className="text-white/20 text-xl md:text-3xl hidden sm:inline-block">/</span>
-              <span aria-disabled="true" className="text-xl md:text-3xl font-display uppercase tracking-wider text-white/30 cursor-not-allowed">
+              <span className="hidden text-base text-white/20 sm:inline-block md:text-lg">/</span>
+              <span aria-disabled="true" className="cursor-not-allowed text-base font-heading uppercase tracking-[0.15em] text-white/30 md:text-lg">
                 Instagram
               </span>
             </div>
@@ -94,7 +94,7 @@ export default function ContactSection() {
               Faculty Adviser
             </div>
             <div className="flex flex-col items-start md:flex-row md:items-baseline gap-2 md:gap-6">
-              <span className="text-2xl md:text-4xl lg:text-5xl font-display uppercase tracking-wider text-white group-hover:text-white/90 transition-colors">
+              <span className="text-2xl md:text-3xl lg:text-4xl font-display uppercase tracking-wider text-white group-hover:text-white/90 transition-colors">
                 {facultyAdviser.name}
               </span>
               <span className="text-sm md:text-base font-sans text-white/40 tracking-[0.1em] uppercase">
