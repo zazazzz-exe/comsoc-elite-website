@@ -51,7 +51,7 @@ export const comsocOfficers: Team = {
     [
       {
         role: "Secretary",
-        name: "Gwynzurin Martinez",
+        name: "Gwyn Zurinz Martinez",
         image: "/images/officers/5. SECRETARY.png",
         email: "martinez_gwynzurinz@plpasig.edu.ph",
         facebook: "https://www.facebook.com/share/19WmYzPQg4/",
