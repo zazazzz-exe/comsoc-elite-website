@@ -1,5 +1,5 @@
 export type Officer = {
-  role: string;
+  role?: string;
   name: string;
   image?: string;
   email?: string;
@@ -42,7 +42,7 @@ export const comsocOfficers: Team = {
       },
       {
         role: "Vice President for External Affairs",
-        name: "Zarra Hexekiel Valles",
+        name: "Zarrah Ezekiel Valles",
         image: "/images/officers/4. VP - EXTERNAL.png",
         email: "valles_zarrahexekiel@plpasig.edu.ph",
         facebook: "https://www.facebook.com/share/14pXvfiSecT/",
@@ -91,40 +91,37 @@ export const comsocOfficers: Team = {
 export const ccsElites: Team = {
   name: "CCS ELITES",
   tiers: [
-    [{ role: "President", name: "———", image: "/images/officers/placeholder3.JPG"}],
     [
-      { role: "VP Internal", name: "———", image: "/images/officers/placeholder3.JPG"},
-      { role: "VP External", name: "———", image: "/images/officers/placeholder3.JPG" },
-    ],
-    [
-      { role: "Secretary", name: "———", image: "/images/officers/placeholder3.JPG" },
-      { role: "Treasurer", name: "———", image: "/images/officers/placeholder3.JPG" },
-      { role: "Auditor", name: "———", image: "/images/officers/placeholder3.JPG" },
-      { role: "PRO", name: "———", image: "/images/officers/placeholder3.JPG" },
-      { role: "PSSC CCS Ambassador", name: "———", image: "/images/officers/placeholder3.JPG" },
+      { name: "Ipei B. Goto", image: "/ccs-elite-logo.png" },
+      { name: "Anon", image: "/ccs-elite-logo.png" },
+      { name: "Klarenz Cobie Manrique", image: "/ccs-elite-logo.png" },
+      { name: "Vehniah Perol Samson", image: "/ccs-elite-logo.png" },
+      { name: "John Michael Torres", image: "/ccs-elite-logo.png" },
     ],
   ],
 };
 
+export const orgContact = {
+  label: "Official Page",
+  url: "https://www.facebook.com/share/14pXvfiSecT/",
+  handle: "@college_of_computer_studies",
+  email: "comsoc@plpcomputersociety.org",
+  office: "Main Building, 6th Floor",
+};
+
 export const facultyAdviser: Adviser = {
-  role: "Faculty Adviser",
+  role: "Comsoc Adviser",
   name: "Racquel Cortez",
   department: "College of Computer Studies",
   image: "/images/faculty/CORTEZ, RACQUEL_4742.JPG",
-  email: "cortez_racquel@plpasig.edu.ph",
-  facebook: "https://www.facebook.com/racquel.a.cortez#",
+  email: orgContact.email,
+  facebook: orgContact.url,
 };
 
 export const ccsElitesAdviser: Adviser = {
-  role: "Faculty Adviser",
+  role: "Elites Adviser",
   name: "Rebecca Fajardo",
-  department: "CCS ELITES",
+  department: "College of Computer Studies",
   image: "/images/faculty/FAJARDO, REBECCA_4759.JPG",
   email: "fajardo_rebecca@plpasig.edu.ph",
-};
-
-export const orgContact = {
-  label: "Official Page",
-  url: "https://www.facebook.com/PLPCOMSOC",
-  handle: "@college_of_computer_studies",
 };

@@ -45,8 +45,8 @@ export default function ContactSection() {
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/80 group-hover:bg-emerald-400 transition-colors shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
               Official Email
             </div>
-            <a href="mailto:valles_zarrahexekiel@plpasig.edu.ph" className="text-[clamp(1rem,5vw,2.25rem)] md:text-4xl lg:text-5xl font-display uppercase tracking-wider text-white group-hover:text-white/90 transition-colors break-all">
-              valles_zarrahexekiel@plpasig.edu.ph
+            <a href="mailto:comsoc@plpcomputersociety.org" className="text-[clamp(1rem,5vw,2.25rem)] md:text-4xl lg:text-5xl font-display uppercase tracking-wider text-white group-hover:text-white/90 transition-colors break-all">
+              comsoc@plpcomputersociety.org
             </a>
             <div className="hidden md:flex justify-end w-24 lg:w-32">
                <Mail className="w-6 h-6 text-white/20 group-hover:text-white/60 transition-colors" />
