@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useCallback, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ArrowRightLeft } from "lucide-react";
@@ -10,6 +10,7 @@ import {
   ccsElites,
   facultyAdviser,
   ccsElitesAdviser,
+  orgContact,
 } from "@/lib/data/officers";
 import type { Officer } from "@/lib/data/officers";
 
@@ -23,7 +24,7 @@ const fadeUp = {
 };
 
 /* ────────────────────────────────────────────────────────────
-   CardFace — one side of the flip card (portrait + text)
+   CardFace — officer portrait + text
    ──────────────────────────────────────────────────────────── */
 function CardFace({ officer }: { officer: Officer }) {
   return (
@@ -38,7 +39,7 @@ function CardFace({ officer }: { officer: Officer }) {
             src={officer.image}
             alt={officer.name}
             fill
-            className="object-cover contrast-125"
+            className={officer.image === "/ccs-elite-logo.png" ? "object-contain p-8" : "object-cover contrast-125"}
             sizes="(max-width: 640px) 50vw, 25vw"
           />
         ) : (
@@ -57,10 +58,12 @@ function CardFace({ officer }: { officer: Officer }) {
         <div className="absolute inset-0 bg-gradient-to-t from-[#121212]/60 via-transparent to-transparent pointer-events-none" />
       </div>
       {/* Text */}
-      <div className="flex h-36 shrink-0 flex-col gap-2 px-4 py-4 text-center md:h-40 md:px-6 md:py-5">
-        <div className="flex min-h-9 items-center justify-center text-[9px] font-heading font-bold uppercase leading-tight tracking-[0.25em] text-white/50 md:text-[10px] md:tracking-[0.3em]">
-          {officer.role}
-        </div>
+      <div className={`flex h-36 shrink-0 flex-col gap-2 px-4 py-4 text-center md:h-40 md:px-6 md:py-5 ${officer.role ? "" : "justify-center"}`}>
+        {officer.role && (
+          <div className="flex min-h-9 items-center justify-center text-[9px] font-heading font-bold uppercase leading-tight tracking-[0.25em] text-white/50 md:text-[10px] md:tracking-[0.3em]">
+            {officer.role}
+          </div>
+        )}
         <div className="flex min-h-8 items-center justify-center text-sm font-display uppercase leading-tight tracking-[0.1em] text-white md:text-base">
           {officer.name}
         </div>
@@ -93,28 +96,17 @@ function CardFace({ officer }: { officer: Officer }) {
   );
 }
 
-/* ────────────────────────────────────────────────────────────
-   FlippableCard — 3D flip card with front + back faces + tilt
-   ──────────────────────────────────────────────────────────── */
-function FlippableCard({
-  front,
-  back,
-  flipped,
-  delay = 0,
-}: {
-  front: Officer;
-  back: Officer;
-  flipped: boolean;
-  delay?: number;
-}) {
-  const tiltRef = useRef<HTMLDivElement>(null);
+function HoverTiltCard({ children }: { children: ReactNode }) {
+  const cardRef = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState({ rotateX: 0, rotateY: 0, scale: 1 });
 
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!tiltRef.current) return;
-    const rect = tiltRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = (e.clientY - rect.top) / rect.height;
+  const handleMouseMove = useCallback((event: MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width;
+    const y = (event.clientY - rect.top) / rect.height;
+
     setTilt({
       rotateX: (0.5 - y) * 12,
       rotateY: (x - 0.5) * 12,
@@ -127,47 +119,17 @@ function FlippableCard({
   }, []);
 
   return (
-    <motion.div
-      {...fadeUp}
-      transition={{ duration: 0.8, delay, ease }}
+    <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="transition-transform duration-200 ease-out will-change-transform"
+      style={{
+        transform: `perspective(800px) rotateX(${tilt.rotateX}deg) rotateY(${tilt.rotateY}deg) scale(${tilt.scale})`,
+      }}
     >
-      <div
-        ref={tiltRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        className="transition-transform duration-200 ease-out will-change-transform"
-        style={{
-          transform: `perspective(800px) rotateX(${tilt.rotateX}deg) rotateY(${tilt.rotateY}deg) scale(${tilt.scale})`,
-        }}
-      >
-        <div style={{ perspective: 1000 }}>
-          <motion.div
-            animate={{ rotateY: flipped ? 180 : 0 }}
-            transition={{ duration: 0.6, delay: delay * 0.5, ease }}
-            className="relative w-full"
-            style={{ transformStyle: "preserve-3d" }}
-          >
-            {/* Front face (COMSOC) — normal flow, establishes height */}
-            <motion.div
-              animate={{ opacity: flipped ? 0 : 1 }}
-              transition={{ duration: 0.3, delay: delay * 0.5 }}
-            >
-              <CardFace officer={front} />
-            </motion.div>
-
-            {/* Back face (CCS ELITES) — absolute overlay */}
-            <motion.div
-              animate={{ opacity: flipped ? 1 : 0 }}
-              transition={{ duration: 0.3, delay: delay * 0.5 }}
-              className="absolute inset-0 w-full h-full"
-              style={{ transform: "rotateY(180deg)" }}
-            >
-              <CardFace officer={back} />
-            </motion.div>
-          </motion.div>
-        </div>
-      </div>
-    </motion.div>
+      {children}
+    </div>
   );
 }
 
@@ -183,11 +145,10 @@ function TierConnector() {
 }
 
 /* ────────────────────────────────────────────────────────────
-   OrgPyramid — renders the flippable pyramid for both orgs
+   OrgPyramid — renders the officer tiers for both orgs
    ──────────────────────────────────────────────────────────── */
 function OrgPyramid({ flipped }: { flipped: boolean }) {
-  const comsocTiers = comsocOfficers.tiers;
-  const elitesTiers = ccsElites.tiers;
+  const tiers = flipped ? ccsElites.tiers : comsocOfficers.tiers;
 
   return (
     <motion.div {...fadeUp} className="flex flex-col items-center w-full">
@@ -209,32 +170,36 @@ function OrgPyramid({ flipped }: { flipped: boolean }) {
         <div className="h-px flex-1 bg-white/10" />
       </div>
 
-      {/* Pyramid tiers — fixed card width, centered */}
-      <div className="flex flex-col items-center w-full">
-        {comsocTiers.map((comsocTier, tierIndex) => {
-          const elitesTier = elitesTiers[tierIndex];
-          const globalOffset = comsocTiers
-            .slice(0, tierIndex)
-            .reduce((sum, t) => sum + t.length, 0);
+      <div className="w-full">
+        <div className="flex w-full flex-col items-center">
+          {tiers.map((tier, tierIndex) => {
+           const globalOffset = tiers
+             .slice(0, tierIndex)
+             .reduce((sum, t) => sum + t.length, 0);
 
           return (
             <div key={tierIndex}>
               {tierIndex > 0 && <TierConnector />}
-              <div className="flex justify-center gap-4 md:gap-6">
-                {comsocTier.map((comsocOfficer, i) => (
-                  <div key={comsocOfficer.name} className="w-[140px] md:w-[200px] shrink-0">
-                    <FlippableCard
-                      front={comsocOfficer}
-                      back={elitesTier[i]}
-                      flipped={flipped}
-                      delay={(globalOffset + i) * 0.05}
-                    />
-                  </div>
+                <div className="flex flex-wrap justify-center gap-4 md:flex-nowrap md:gap-6">
+                {tier.map((officer, i) => (
+                  <motion.div
+                    key={officer.name}
+                    {...(flipped
+                      ? { initial: { opacity: 0, y: 30 }, animate: { opacity: 1, y: 0 } }
+                      : fadeUp)}
+                    transition={{ duration: 0.8, delay: (globalOffset + i) * 0.05, ease }}
+                    className={flipped ? "w-[140px] shrink-0 md:w-auto md:flex-1 md:shrink" : "w-[140px] shrink-0 md:w-[200px]"}
+                  >
+                    <HoverTiltCard>
+                      <CardFace officer={officer} />
+                    </HoverTiltCard>
+                  </motion.div>
                 ))}
               </div>
             </div>
           );
         })}
+        </div>
       </div>
     </motion.div>
   );
@@ -246,6 +211,17 @@ function OrgPyramid({ flipped }: { flipped: boolean }) {
 export default function OfficersSection() {
   const [flipped, setFlipped] = useState(false);
   const adviser = flipped ? ccsElitesAdviser : facultyAdviser;
+  const contactInfo = flipped
+    ? [
+        { label: "Email", value: "ccsliteswashere", icon: "✉" },
+        { label: "Office", value: orgContact.office, icon: "📍" },
+        { label: "Social", value: "@ccs_elite_org", icon: "❖" },
+      ]
+    : [
+        { label: "Email", value: orgContact.email, href: `mailto:${orgContact.email}`, icon: "✉" },
+        { label: "Office", value: orgContact.office, icon: "📍" },
+        { label: "Social", value: orgContact.handle, href: orgContact.url, icon: "❖" },
+      ];
 
   return (
     <section
@@ -293,7 +269,7 @@ export default function OfficersSection() {
           {/* Faculty Adviser */}
           <div className="flex flex-col gap-10">
             <h3 className="text-sm font-heading font-bold tracking-[0.3em] uppercase text-white/50">
-              Faculty Adviser
+              {adviser.role}
             </h3>
             <AnimatePresence mode="wait">
               <motion.div
@@ -334,24 +310,28 @@ export default function OfficersSection() {
                   <div className="text-base font-sans text-white/60">
                     {adviser.department}
                   </div>
-                  {adviser.email && adviser.facebook && (
+                  {(adviser.email || adviser.facebook) && (
                     <div className="flex gap-2 pt-1">
-                      <a
-                        href={`mailto:${adviser.email}`}
-                        aria-label={`Email ${adviser.name}`}
-                        className="flex h-9 w-9 items-center justify-center border border-white/15 text-white/50 transition-colors hover:border-white/50 hover:text-white"
-                      >
-                        <IconMail size={16} stroke={1.5} />
-                      </a>
-                      <a
-                        href={adviser.facebook}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`${adviser.name}'s Facebook profile`}
-                        className="flex h-9 w-9 items-center justify-center border border-white/15 text-white/50 transition-colors hover:border-white/50 hover:text-white"
-                      >
-                        <IconBrandFacebook size={16} stroke={1.5} />
-                      </a>
+                      {adviser.email && (
+                        <a
+                          href={`mailto:${adviser.email}`}
+                          aria-label={`Email ${adviser.name}`}
+                          className="flex h-9 w-9 items-center justify-center border border-white/15 text-white/50 transition-colors hover:border-white/50 hover:text-white"
+                        >
+                          <IconMail size={16} stroke={1.5} />
+                        </a>
+                      )}
+                      {adviser.facebook && (
+                        <a
+                          href={adviser.facebook}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${adviser.name}'s Facebook profile`}
+                          className="flex h-9 w-9 items-center justify-center border border-white/15 text-white/50 transition-colors hover:border-white/50 hover:text-white"
+                        >
+                          <IconBrandFacebook size={16} stroke={1.5} />
+                        </a>
+                      )}
                     </div>
                   )}
                 </div>
@@ -365,11 +345,7 @@ export default function OfficersSection() {
               Contact & HQ
             </h3>
             <div className="flex flex-col w-full">
-              {[
-                { label: "Email", value: "ccsliteswashere", icon: "✉" },
-                { label: "Office", value: "CCS Building, Room 402", icon: "📍" },
-                { label: "Social", value: "@ccs_elite_org", icon: "❖" },
-              ].map((info, idx) => (
+              {contactInfo.map((info, idx) => (
                 <div key={idx} className="flex justify-between items-center py-6 border-b border-white/10 group cursor-default">
                   <div className="flex items-center gap-6">
                     <span className="text-white/30 text-xl group-hover:text-emerald-400 transition-colors duration-300">
@@ -379,9 +355,20 @@ export default function OfficersSection() {
                       {info.label}
                     </span>
                   </div>
-                  <span className="text-base md:text-lg font-sans text-white/90">
-                    {info.value}
-                  </span>
+                  {info.href ? (
+                    <a
+                      href={info.href}
+                      target={info.label === "Social" ? "_blank" : undefined}
+                      rel={info.label === "Social" ? "noopener noreferrer" : undefined}
+                      className="text-base font-sans text-white/90 transition-colors hover:text-emerald-400 md:text-lg"
+                    >
+                      {info.value}
+                    </a>
+                  ) : (
+                    <span className="text-base md:text-lg font-sans text-white/90">
+                      {info.value}
+                    </span>
+                  )}
                 </div>
               ))}
             </div>

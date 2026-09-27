@@ -70,13 +70,9 @@ export default function Footer() {
             Contact
           </div>
           <div className="flex flex-col gap-4 text-sm text-white/55">
-            <a href="mailto:valles_zarrahexekiel@plpasig.edu.ph" className="flex items-start gap-3 transition-colors hover:text-white">
+            <a href="mailto:comsoc@plpcomputersociety.org" className="flex items-start gap-3 transition-colors hover:text-white">
               <IconMail size={16} stroke={1.5} className="mt-0.5 shrink-0" />
-              <span>valles_zarrahexekiel@plpasig.edu.ph</span>
-            </a>
-            <a href="mailto:zarrahexekiel@gmail.com" className="flex items-start gap-3 transition-colors hover:text-white">
-              <IconMail size={16} stroke={1.5} className="mt-0.5 shrink-0" />
-              <span>zarrahexekiel@gmail.com</span>
+              <span>comsoc@plpcomputersociety.org</span>
             </a>
             <a href="tel:+639153868047" className="flex items-center gap-3 transition-colors hover:text-white">
               <IconPhone size={16} stroke={1.5} className="shrink-0" />
