@@ -1,0 +1,33 @@
+{
+  "name": "@comsoc/website",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -H 0.0.0.0 -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tabler/icons-react": "^3.46.0",
+    "@supabase/supabase-js": "^2.98.0",
+    "framer-motion": "^12.42.2",
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.25",
+    "lucide-react": "^1.23.0",
+    "next": "^16.3.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "^16.3.1",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

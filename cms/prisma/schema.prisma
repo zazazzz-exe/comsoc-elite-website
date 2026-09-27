@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ContentStatus {
+  draft
+  published
+  archived
+
+  @@map("content_status")
+}
+
+enum Organization {
+  comsoc
+  ccs_elites
+
+  @@map("organization")
+}
+
+enum PersonKind {
+  officer
+  adviser
+
+  @@map("person_kind")
+}
+
+enum EventKind {
+  upcoming
+  gallery
+
+  @@map("event_kind")
+}
+
+model CmsAdmin {
+  userId    String   @id @map("user_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("cms_admins")
+}
+
+model SiteSettings {
+  id               Boolean  @id @default(true)
+  organizationName String   @default("PLP Computer Society") @map("organization_name")
+  heroSummary      String?  @map("hero_summary")
+  aboutSummary     String?  @map("about_summary")
+  mission          String?
+  vision           String?
+  contactEmail     String?  @map("contact_email")
+  contactPhone     String?  @map("contact_phone")
+  facebookUrl      String?  @map("facebook_url")
+  seoTitle         String?  @map("seo_title")
+  seoDescription   String?  @map("seo_description")
+  updatedAt        DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("site_settings")
+}
+
+model FacultyMember {
+  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String
+  department   String
+  imageUrl     String?       @map("image_url")
+  imageAssetId String?       @map("image_asset_id") @db.Uuid
+  imageAsset   MediaAsset?   @relation("FacultyImage", fields: [imageAssetId], references: [id], onDelete: SetNull)
+  displayOrder Int           @default(0) @map("display_order")
+  status       ContentStatus @default(draft)
+  updatedAt    DateTime      @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@index([imageAssetId])
+  @@map("faculty_members")
+}
+
+model OrganizationPerson {
+  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String
+  role         String
+  organization Organization
+  personKind   PersonKind    @map("person_kind")
+  tier         Int           @default(0)
+  department   String?
+  email        String?
+  facebookUrl  String?       @map("facebook_url")
+  imageUrl     String?       @map("image_url")
+  imageAssetId String?       @map("image_asset_id") @db.Uuid
+  imageAsset   MediaAsset?   @relation("PersonImage", fields: [imageAssetId], references: [id], onDelete: SetNull)
+  displayOrder Int           @default(0) @map("display_order")
+  status       ContentStatus @default(draft)
+  updatedAt    DateTime      @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@index([imageAssetId])
+  @@map("organization_people")
+}
+
+model Event {
+  id                String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug              String        @unique
+  title             String
+  eventKind         EventKind     @map("event_kind")
+  startsAt          DateTime      @map("starts_at") @db.Date
+  endsAt            DateTime?     @map("ends_at") @db.Date
+  location          String?
+  timeLabel         String?       @map("time_label")
+  budget            Decimal?      @db.Decimal(12, 2)
+  description       String?
+  coverImageUrl     String?       @map("cover_image_url")
+  coverImageAssetId String?       @map("cover_image_asset_id") @db.Uuid
+  coverImageAsset   MediaAsset?   @relation("EventCoverImage", fields: [coverImageAssetId], references: [id], onDelete: SetNull)
+  media             EventMedia[]
+  displayOrder      Int           @default(0) @map("display_order")
+  status            ContentStatus @default(draft)
+  updatedAt         DateTime      @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@index([coverImageAssetId])
+  @@map("events")
+}
+
+model EventMedia {
+  id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId      String      @map("event_id") @db.Uuid
+  event        Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  imageUrl     String      @map("image_url")
+  mediaAssetId String?     @map("media_asset_id") @db.Uuid
+  mediaAsset   MediaAsset? @relation("EventMediaAsset", fields: [mediaAssetId], references: [id], onDelete: SetNull)
+  altText      String?     @map("alt_text")
+  displayOrder Int         @default(0) @map("display_order")
+
+  @@index([eventId])
+  @@index([mediaAssetId])
+  @@map("event_media")
+}
+
+model MediaAsset {
+  id               String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  publicId         String               @unique @map("public_id")
+  url              String
+  resourceType     String               @map("resource_type")
+  format           String?
+  bytes            Int?
+  width            Int?
+  height           Int?
+  altText          String?              @map("alt_text")
+  createdAt        DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  facultyImages    FacultyMember[]      @relation("FacultyImage")
+  personImages     OrganizationPerson[] @relation("PersonImage")
+  eventCoverImages Event[]              @relation("EventCoverImage")
+  eventMediaAssets EventMedia[]         @relation("EventMediaAsset")
+
+  @@map("media_assets")
+}
+
+model CmsAuditLog {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  actorId    String   @map("actor_id")
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String?  @map("entity_id") @db.Uuid
+  details    Json     @default("{}")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([createdAt(sort: Desc)])
+  @@index([entityType, entityId])
+  @@map("cms_audit_logs")
+}

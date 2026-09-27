@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# COMSOC Platform
 
-## Getting Started
+Two independent Next.js applications share one Supabase project:
 
-First, run the development server:
+- `website/`: public COMSOC landing site on port 3000.
+- `cms/`: administrator interface on port 3001, mounted at `/admin` through the website proxy.
+
+## Development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000` for the website and `http://localhost:3000/admin` for the mounted CMS. `http://localhost:3001/admin` also serves the CMS directly.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run dev:website
+npm run dev:cms
+npm run build
+npm run lint
+npm run typecheck
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Environment
 
-## Learn More
+Copy `website/.env.example` and `cms/.env.example` to their respective `.env.local` files.
 
-To learn more about Next.js, take a look at the following resources:
+- `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` are shared public Supabase settings.
+- `CMS_ORIGIN` is website-only and points to the separate CMS deployment.
+- `SUPABASE_SERVICE_ROLE_KEY` is CMS-only and server-only. Do not expose it with a `NEXT_PUBLIC_` prefix.
+- `DATABASE_URL` is CMS-only and connects Prisma to Supabase Postgres. Do not expose it with a `NEXT_PUBLIC_` prefix.
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET` are CMS-only credentials for media uploads.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Apply `supabase/migrations/0001_cms.sql` and `supabase/migrations/0002_cms_schema_alignment.sql` to the shared project, then add approved `auth.users.id` values to `public.cms_admins`. A valid Supabase account has no CMS access unless it is explicitly authorized in that table.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See `MIGRATION_PLAN.md` for the audit, content model, and rollout plan.
