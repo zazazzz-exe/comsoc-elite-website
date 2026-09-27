@@ -213,7 +213,7 @@ export default function OfficersSection() {
   const adviser = flipped ? ccsElitesAdviser : facultyAdviser;
   const contactInfo = flipped
     ? [
-        { label: "Email", value: "ccsliteswashere", icon: "✉" },
+        { label: "Email", value: "ccseliteswerehere", icon: "✉" },
         { label: "Office", value: orgContact.office, icon: "📍" },
         { label: "Social", value: "@ccs_elite_org", icon: "❖" },
       ]

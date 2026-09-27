@@ -28,6 +28,19 @@ export const metadata: Metadata = {
   description:
     "The official website of the PLP College of Computer Studies Computer Society, connecting students through learning, leadership, events, and collaboration.",
   keywords: ["PLP Computer Society", "College of Computer Studies", "student organization", "Pasig"],
+  openGraph: {
+    title: "College of Computer Studies — Computer Society",
+    description:
+      "The official website of the PLP College of Computer Studies Computer Society, connecting students through learning, leadership, events, and collaboration.",
+    images: "/comsoc-logo.png",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "College of Computer Studies — Computer Society",
+    description:
+      "The official website of the PLP College of Computer Studies Computer Society, connecting students through learning, leadership, events, and collaboration.",
+    images: "/comsoc-logo.png",
+  },
 };
 
 export default function RootLayout({
